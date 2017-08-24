@@ -6,18 +6,18 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>android ndk开发---android.mk/application.mk | goggeryang`s blogs</title>
+  <title>android ndk开发---android.mk/application.mk/cMake.txt | goggeryang`s blogs</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="description" content="android ndk开发必备的知识点：        android.mk 、application.mk或者cMake.txt 和 android ndk相应的代码编写,        android studio2.x已经支持cMake.txt的形式编译ndk相关的库；本文只针对android.mk和application.mk构建ndk库的相关库的编写 ##android.mk文件的编写">
 <meta property="og:type" content="article">
-<meta property="og:title" content="android ndk开发---android.mk&#x2F;application.mk">
-<meta property="og:url" content="http://yoursite.com/2016/01/11/oneblog/index.html">
+<meta property="og:title" content="android ndk开发---android.mk&#x2F;application.mk&#x2F;cMake.txt">
+<meta property="og:url" content="http://yoursite.com/2016/01/11/ndk编程之androidmk和applicmk/index.html">
 <meta property="og:site_name" content="goggeryang`s blogs">
 <meta property="og:description" content="android ndk开发必备的知识点：        android.mk 、application.mk或者cMake.txt 和 android ndk相应的代码编写,        android studio2.x已经支持cMake.txt的形式编译ndk相关的库；本文只针对android.mk和application.mk构建ndk库的相关库的编写 ##android.mk文件的编写">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2017-08-23T05:32:36.000Z">
+<meta property="og:updated_time" content="2017-08-24T05:47:36.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="android ndk开发---android.mk&#x2F;application.mk">
+<meta name="twitter:title" content="android ndk开发---android.mk&#x2F;application.mk&#x2F;cMake.txt">
 <meta name="twitter:description" content="android ndk开发必备的知识点：        android.mk 、application.mk或者cMake.txt 和 android ndk相应的代码编写,        android studio2.x已经支持cMake.txt的形式编译ndk相关的库；本文只针对android.mk和application.mk构建ndk库的相关库的编写 ##android.mk文件的编写">
   
     <link rel="alternative" href="/atom.xml" title="goggeryang`s blogs" type="application/atom+xml">
@@ -158,19 +158,19 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-oneblog" class="article article-type-post " itemscope itemprop="blogPost">
+            <article id="post-ndk编程之androidmk和applicmk" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 class="article-title" itemprop="name">
-      android ndk开发---android.mk/application.mk
+      android ndk开发---android.mk/application.mk/cMake.txt
     </h1>
   
 
         
-        <a href="/2016/01/11/oneblog/" class="archive-article-date">
+        <a href="/2016/01/11/ndk编程之androidmk和applicmk/" class="archive-article-date">
   	<time datetime="2016-01-11T00:30:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2016-01-11</time>
 </a>
         
@@ -255,7 +255,47 @@
 <p>#####RTTI support:</p>
 <p>与异常类似，自动NDK r5, NDK ToolChain就支持RTTI,但在缺省情况下都是用-fno-rtti来编译C++代码。</p>
 <p>如果想Enable RTTI；<br>在Andriod.mk中：<br>LOCAL_CPP_FEATURES += rtti (推荐)<br>或者<br>LOCAL_CPPFLAGS += -frtti<br>或者在：Application.mk:<br>APP_CPPFLAGS += -frtti</p>
+<p>##android中cMake.txt的使用</p>
+<pre><code>    androidstudio2.2以后对Cmake的支持已经比较好了，cMake相比makefile；简单了不少，这个随便介绍一下cMake相关的知识
+    cmake的基本语法：
+#指定cmke的版本
+    cmake_minimum_required(VERSION 3.4.1)
 
+#创建原生library
+    add_library(
+            #设置library的名字
+            dbsdk
+            #设置library生成的库的类型（动态库或者静态库）
+            SHARED  #STATIC
+            #设置source文件的相对路径（相对于该文件）
+            src/main/cpp/DBsdk.cpp
+
+    )
+创建预构建库（之前已经预先构建好的库文件）需要使用IMPORTED
+    add_library( avcodec-57
+             SHARED
+             IMPORTED )
+设置预构建库的路径
+    set_target_properties( avcodec-57  对应到上面的名称
+                       PROPERTIES IMPORTED_LOCATION
+                       ../../../../libs/${ANDROID_ABI}/libavcodec-57.so )
+
+    还需要定位到头文件
+    include_directories( libs/include )//获取头文件的目录,在编译时需要定位到都文件
+
+#获取系统ndk一些支持的库
+find_library( 
+        # 设置library的名称
+          log-lib
+          #设置需要导入到项目的ndk的支持库
+          log )
+ 还需要关联该库到你的目标库
+ target_link_libraries( # 指定目标库
+                   dbsdk
+
+                   # 连接系统库到目标库
+                   ${log-lib} )
+</code></pre>
       
 
       
@@ -334,7 +374,7 @@
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="http://s.jiathis.com/qrcode.php?url=http://yoursite.com/2016/01/11/oneblog/" alt="微信分享二维码">
+      <img src="http://s.jiathis.com/qrcode.php?url=http://yoursite.com/2016/01/11/ndk编程之androidmk和applicmk/" alt="微信分享二维码">
     </div>
 </div>
 
@@ -515,7 +555,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
     
     	<section class="tools-section tools-section-me" q-show="aboutme">
   	  	
-  	  		<div class="aboutme-wrap" id="js-aboutme">很惭愧&lt;br&gt;&lt;br&gt;只做了一点微小的工作&lt;br&gt;谢谢大家</div>
+  	  		<div class="aboutme-wrap" id="js-aboutme">搞过Java；干过android，目前主要SDK开发</div>
   	  	
     	</section>
     
